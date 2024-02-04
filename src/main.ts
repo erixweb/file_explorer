@@ -3,9 +3,7 @@ import { readDir, renameFile } from "@tauri-apps/api/fs"
 import { appDir, appFiles } from "./store"
 import "./styles.css"
 
-
-
-const readDirectory = await readDirAsync({ dir: "C:/" })
+const readDirectory = await readDirAsync({ dir: "E:/" })
 appFiles.set(readDirectory)
 
 const app = new App({
@@ -13,9 +11,10 @@ const app = new App({
 })
 
 export async function readDirAsync({ dir }: { dir: string }) {
+	console.log(dir)
 	return readDir(dir)
 }
-export async function renameFileAsync (initial: string, result: string) {
+export async function renameFileAsync(initial: string, result: string) {
 	await renameFile(initial, result, { dir: appDir.get() }).catch((err) => {
 		console.error(err)
 	})

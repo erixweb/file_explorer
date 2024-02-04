@@ -5,7 +5,7 @@ export const baseDirectories = {
 	Home: { dir: "C:/" },
 }
 export const appFiles = writable<FileEntry[]>([])
-export const appDir = storeAppDir({ dir: baseDirectories.Home })
+export const appDir = storeAppDir({ dir: baseDirectories.Home.dir })
 
 export function storeAppDir(value: any) {
 	let originalWritable = writable(value)
