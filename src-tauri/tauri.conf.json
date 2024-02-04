@@ -14,7 +14,17 @@
 			"all": false,
 			"fs": {
 				"all": true,
-				"scope": ["**"]
+				"scope": ["**", "$APP/databases/*"]
+			},
+			"shell": {
+				"all": true,
+				"scope": [
+					{
+						"name": "open-vscode",
+						"cmd": "code",
+						"args": [{ "validator": "\\S+" }]
+					}
+				]
 			}
 		},
 		"bundle": {

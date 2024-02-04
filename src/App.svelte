@@ -2,9 +2,12 @@
 	import type { FileEntry } from "@tauri-apps/api/fs"
 	import { readDirAsync, renameFileAsync } from "./main"
 	import { appDir, appFiles, baseDirectories } from "./store"
+	import FolderIcon from "./lib/folder-icon.svelte"
+	import { open } from "@tauri-apps/api/shell"
 
 	let files: FileEntry[] = $appFiles
 	let nameInput = ""
+	let currentDirectory = ""
 
 	const filterByName = (name: string) => {
 		if (name.length === 0) {
@@ -16,34 +19,52 @@
 			file.name?.toLocaleLowerCase().includes(name.toLocaleLowerCase()),
 		)
 	}
-	const renameFileBox = (name: string) => {
+	const renameFileBox = (name: any) => {
 		const resultName = prompt("Renombra tu archivo:")
 		if (!resultName) return
 
 		renameFileAsync(name, resultName)
 	}
 	appDir.subscribe(async (val) => {
-		files = await readDirAsync({ dir: val.dir || "", baseDir: val.baseDir || "" })
+		files = await readDirAsync({ dir: val.dir })
+		currentDirectory = val.dir
 	})
 	const directories = Object.keys(baseDirectories)
 </script>
 
 <main class="text-start min-h-[100vh] bg-zinc-800 text-white font-sans">
-	<form on:submit|preventDefault={() => filterByName(nameInput)} class="p-[20px] w-full">
-		<input
-			type="text"
-			bind:value={nameInput}
-			placeholder="Busca un archivo..."
-			class=" bg-zinc-600 rounded-[3px] px-[6px] py-[6px] w-full outline-none"
-		/>
-	</form>
+	<div class="p-[20px]">
+		<button on:click={async () => await open(appDir.get().dir)} class="flex gap-[5px]">
+			<FolderIcon />
+			Open File Explorer
+		</button>
+	</div>
+	<div class="p-[20px]">
+		<form on:submit|preventDefault={() => filterByName(nameInput)} class="w-full">
+			<input
+				type="text"
+				bind:value={currentDirectory}
+				placeholder="Busca un archivo..."
+				class=" bg-zinc-600 rounded-[3px] px-[6px] py-[6px] w-full outline-none"
+			/>
+		</form>
+	</div>
+	<div class="p-[20px] flex">
+		<form on:submit|preventDefault={() => filterByName(nameInput)} class="w-full">
+			<input
+				type="text"
+				bind:value={nameInput}
+				placeholder="Busca un archivo..."
+				class=" bg-zinc-600 rounded-[3px] px-[6px] py-[6px] w-full outline-none"
+			/>
+		</form>
+	</div>
 	<div class="flex gap-[20px] px-[20px]">
 		{#each directories as directory}
 			<button
 				on:click={() =>
 					appDir.set({
-						dir: baseDirectories[directory].dir || "",
-						baseDir: baseDirectories[directory].baseDir || "",
+						dir: baseDirectories[directory].dir,
 					})}>{directory}</button
 			>
 		{/each}
@@ -57,11 +78,14 @@
 							on:click={() =>
 								appDir.set({
 									dir: file.path,
-									baseDir: "",
-								})}>{file.name}</button
+								})}
+							class="flex gap-[10px]"
 						>
+							<FolderIcon />
+							{file.name}
+						</button>
 					{:else}
-						<h2>{file.name}</h2>
+						<button on:dblclick={async () => await open(file.path)}>{file.name}</button>
 					{/if}
 				</div>
 				<div>
