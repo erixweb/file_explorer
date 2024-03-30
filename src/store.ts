@@ -1,8 +1,18 @@
 import { BaseDirectory, type FileEntry } from "@tauri-apps/api/fs"
 import { writable } from "svelte/store"
 
-export const baseDirectories = {
+export const baseDirectories: BaseDirectories = {
 	Home: { dir: "C:/" },
+	Users: { dir: "C:/Users/" },
+}
+
+type BaseDirectories = {
+	Home: {
+		dir: string
+	},
+	Users: {
+		dir: string
+	}
 }
 export const appFiles = writable<FileEntry[]>([])
 export const appDir = storeAppDir({ dir: baseDirectories.Home.dir })
