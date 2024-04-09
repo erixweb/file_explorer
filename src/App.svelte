@@ -1,9 +1,10 @@
 <script lang="ts">
 	import type { FileEntry } from "@tauri-apps/api/fs"
-	import { readDirAsync, renameFileAsync } from "./main"
+	import app, { readDirAsync, removeFileAsync, renameFileAsync } from "./main"
 	import { appDir, appFiles, baseDirectories } from "./store"
 	import FolderIcon from "./lib/folder-icon.svelte"
 	import { open } from "@tauri-apps/api/shell"
+	import { ask } from "@tauri-apps/api/dialog"
 
 	let files: FileEntry[] = $appFiles
 	let nameInput = ""
@@ -19,11 +20,20 @@
 			file.name?.toLocaleLowerCase().includes(name.toLocaleLowerCase()),
 		)
 	}
-	const renameFileBox = (name: any) => {
+	const renameFileBox = async (name: any) => {
 		const resultName = prompt("Renombra tu archivo:")
 		if (!resultName) return
 
-		renameFileAsync(name, resultName)
+		await renameFileAsync(name, resultName)
+
+		files = await readDirAsync({ dir: appDir.get().dir })
+		console.log(files)
+	}
+	const deleteFile = (name: any) => {
+		const resultName = confirm("Desea eliminar este archivo?")
+		if (!resultName) return
+
+		removeFileAsync(name)
 	}
 	appDir.subscribe(async (val) => {
 		files = await readDirAsync({ dir: val.dir })
@@ -88,9 +98,14 @@
 						<button on:dblclick={async () => await open(file.path)}>{file.name}</button>
 					{/if}
 				</div>
-				<div>
-					<button on:click={() => renameFileBox(file.name)}>Renombrar</button>
-				</div>
+				<section class="flex gap-[20px]">
+					<div>
+						<button on:click={() => renameFileBox(file.name)}>Renombrar</button>
+					</div>
+					<div>
+						<button on:click={() => deleteFile(file.name)}>Delete</button>
+					</div>
+				</section>
 			</div>
 		{/each}
 	</div>

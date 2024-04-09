@@ -16,6 +16,9 @@
 				"all": true,
 				"scope": ["**", "$APP/databases/*"]
 			},
+			"path": {
+				"all": true
+			},
 			"shell": {
 				"all": true,
 				"scope": [
