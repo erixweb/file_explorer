@@ -19,13 +19,16 @@ export async function readDirAsync({ dir }: { dir: string }) {
 }
 export async function renameFileAsync(initial: string, result: string) {
 	const currentDir = appDir.get().dir
-	initial = await resolve(`${currentDir}/${initial}`)
-	await renameFile(initial, `${currentDir}/${result}`).catch((err) => {
+	const file = await resolve(`${currentDir}/${initial}`)
+	await renameFile(file, `${currentDir}/${result}`).catch((err) => {
 		console.error(err)
 	})
 }
 export async function removeFileAsync(fileName: string) {
-	await removeFile(fileName, { dir: appDir.get() }).catch((err) => {
+	const currentDir = appDir.get().dir
+	const file = await resolve(`${currentDir}/${fileName}`)
+
+	await removeFile(file).catch((err) => {
 		console.error(err)
 	})
 }
